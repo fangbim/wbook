@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
 export async function generateMetadata(
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
   const book = await getBookById((await params).id);
 
@@ -39,20 +39,20 @@ export async function generateMetadata(
 export default async function BookDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
   console.log("User ID from session:", userId);
 
-  const book = await getBookById(params.id);
+  const book = await getBookById((await params).id);
   console.log("Book Detail Page - Book:", book);
   if (!book) return notFound();
 
   let userBookRaw = null;
   if (userId) {
-    userBookRaw = await getUserBook(params.id, userId);
+    userBookRaw = await getUserBook((await params).id, userId);
   }
   console.log("Book Detail Page - User Book:", userBookRaw);
 

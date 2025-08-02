@@ -28,11 +28,15 @@ export default function SignInPage() {
       });
 
       if (res?.ok) {
+        // Force a small delay to ensure session is properly set
+        await new Promise(resolve => setTimeout(resolve, 100));
         router.push("/collection");
+        router.refresh(); // Refresh to ensure middleware recognizes the new session
       } else {
         setError(res?.error || "Email atau password salah.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Sign in error:", error);
       setError("Gagal terhubung ke server.");
     } finally {
       setLoading(false);

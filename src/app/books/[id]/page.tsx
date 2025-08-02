@@ -5,9 +5,9 @@ import { Metadata } from "next";
 import { getBookById } from "@/lib/book";
 
 export async function generateMetadata(
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<Metadata> {
-  const book = await getBookById(params.id);
+  const book = await getBookById((await params).id);
 
   if (!book) {
     return {
@@ -37,7 +37,7 @@ export async function generateMetadata(
 export default async function BookDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;  
 }) {
   const  paramsId = (await params).id;
 
