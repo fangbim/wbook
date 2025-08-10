@@ -44,17 +44,13 @@ export default async function BookDetailPage({
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
-  console.log("User ID from session:", userId);
-
   const book = await getBookById((await params).id);
-  console.log("Book Detail Page - Book:", book);
   if (!book) return notFound();
 
   let userBookRaw = null;
   if (userId) {
     userBookRaw = await getUserBook((await params).id, userId);
   }
-  console.log("Book Detail Page - User Book:", userBookRaw);
 
   const userBook = userBookRaw
     ? {

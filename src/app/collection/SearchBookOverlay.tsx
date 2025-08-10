@@ -137,7 +137,7 @@ export default function SearchBookOverlay({ isOpen, onClose, onAdd }: Props) {
                   }
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     searchType === key
-                      ? "bg-green-500 text-white"
+                      ? "bg-gradient-to-r from-gray-800 to-gray-700 text-white"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
@@ -172,7 +172,7 @@ export default function SearchBookOverlay({ isOpen, onClose, onAdd }: Props) {
         <div className="flex-1 overflow-auto p-6">
           {isLoading ? (
             <div className="flex flex-col items-center py-12">
-              <Loader size="lg" color="green" />
+              <Loader size="lg" color="black" />
               <p className="text-gray-600 mt-4">Searching for books...</p>
             </div>
           ) : hasSearched ? (
@@ -202,7 +202,8 @@ export default function SearchBookOverlay({ isOpen, onClose, onAdd }: Props) {
                       <div className="flex gap-2 mt-2">
                         <Button
                           size="xs"
-                          variant="light"
+                          variant="outline"
+                          color="gray"
                           className="text-xs px-2"
                           onClick={() => handleBookClick(book.id)}
                           rightSection={<BiSolidDetail size={12} />}
@@ -212,7 +213,7 @@ export default function SearchBookOverlay({ isOpen, onClose, onAdd }: Props) {
                         <Button
                           size="xs"
                           variant="filled"
-                          color="green"
+                          color="teal"
                           className="text-xs px-2"
                           onClick={(e) => {
                             e.stopPropagation();

@@ -1,16 +1,14 @@
 import { useBookActions } from "@/hooks/useBookActions";
 import { Book } from "@/schemas/book";
-import { ActionIcon, Menu } from "@mantine/core";
+import { ActionIcon, Menu, Rating } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaRegEdit } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { IoShareSocialOutline } from "react-icons/io5";
 import { LuUser } from "react-icons/lu";
 import { MdDeleteOutline } from "react-icons/md";
-import { TiStar } from "react-icons/ti";
-
 
 
 interface BookHeaderProps {
@@ -18,31 +16,6 @@ interface BookHeaderProps {
   setIsFavorited: (isFavorited: boolean) => void;
   isFavorited: boolean;
 }
-
-const reviews = [
-  {
-    id: "1",
-    user: { name: "Sarah W.", avatarUrl: "/avatars/sarah.jpg" },
-    rating: 5,
-    content:
-      "An absolutely fantastic read! Couldn't put it down. The characters are so well-developed and the plot is gripping.",
-  },
-  {
-    id: "2",
-    user: { name: "David L.", avatarUrl: "/avatars/david.jpg" },
-    rating: 4,
-    content:
-      "A very interesting perspective on the topic. Well-researched and thought-provoking, though it dragged a bit in the middle.",
-  },
-  {
-    id: "3",
-    user: { name: "Mia K.", avatarUrl: "/avatars/mia.jpg" },
-    rating: 5,
-    content: "This book changed my life! I highly recommend it to everyone.",
-  },
-];
-
-const rating = (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
 
 
 export default function BookHeader({
@@ -54,6 +27,34 @@ export default function BookHeader({
 
   const pathname = usePathname();
   const showMenu = pathname.startsWith("/collection/books/");
+
+  const [averageRating, setAverageRating] = useState<number>(0);
+  
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`/api/review?bookId=${book.id}`);
+        const data = await res.json();
+
+        if (data.length > 0) {
+          const total = data.reduce(
+            (acc: number, review: { rating: number }) => acc + review.rating,
+            0
+          );
+          const avg = total / data.length;
+          setAverageRating(parseFloat(avg.toFixed(1)));
+        } else {
+          setAverageRating(0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+
+    useEffect(() => {
+      if (book.id) {
+        fetchReviews();
+      }
+    }, [book.id]);
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -67,6 +68,7 @@ export default function BookHeader({
             className="rounded-lg shadow-lg"
           />
 
+          {showMenu && (
           <div className="flex md:hidden justify-center gap-4 mt-4">
             <Menu shadow="md" width={150} position="bottom-end">
               <Menu.Target>
@@ -83,11 +85,6 @@ export default function BookHeader({
               </Menu.Target>
 
               <Menu.Dropdown>
-                <Link href="/profile">
-                  <Menu.Item leftSection={<FaRegEdit size={14} />}>
-                    Edit
-                  </Menu.Item>
-                </Link>
                 <Link href="/collection">
                   <Menu.Item
                     onClick={(e) => {
@@ -105,6 +102,7 @@ export default function BookHeader({
               </Menu.Dropdown>
             </Menu>
           </div>
+          )}
         </div>
 
         <div className="flex-1">
@@ -118,18 +116,9 @@ export default function BookHeader({
 
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <TiStar
-                  key={i}
-                  className={`w-5 h-5 ${
-                    i < Math.floor(parseFloat(rating))
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-              <span className="text-sm text-gray-600 ml-2">
-                {rating} ({reviews.length} reviews)
+              <Rating value={averageRating} fractions={4} defaultValue={3.75} readOnly />
+              <span className="text-sm text-gray-600">
+                {averageRating.toFixed(1)}
               </span>
             </div>
           </div>
@@ -179,11 +168,6 @@ export default function BookHeader({
             </Menu.Target>
 
             <Menu.Dropdown>
-              <Link href="/profile">
-                <Menu.Item leftSection={<FaRegEdit size={14} />}>
-                  Edit
-                </Menu.Item>
-              </Link>
               <Link href="/collection">
                 <Menu.Item
                   onClick={(e) => {

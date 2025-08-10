@@ -6,10 +6,17 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import { Avatar } from '@mantine/core';
+import { useUserBooksStore } from '@/stores/useUserBooksStore';
+import { useQuotesStore } from '@/stores/useQuoteStore';
+import { useFlashcardStore } from '@/stores/useFlascardStore';
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
+  const { userBooks } = useUserBooksStore();
   const router = useRouter();
+
+  const totalQuotes = useQuotesStore((state) => state.getTotalQuotes());
+  const totalFlashcards = useFlashcardStore((state) => state.getTotalFlashcards());
   
   // Mock data - replace with actual API calls
   const [stats, setStats] = useState({
@@ -34,9 +41,9 @@ export default function ProfilePage() {
     if (status === 'authenticated') {
       const timer = setTimeout(() => {
         setStats({
-          totalBooks: 24,
-          totalQuotes: 186,
-          totalFlashcards: 342,
+          totalBooks: userBooks.length,
+          totalQuotes: totalQuotes,
+          totalFlashcards: totalFlashcards,
           readingStreak: 12,
           favoriteGenre: 'Science Fiction'
         });

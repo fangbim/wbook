@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import Navbar from "@/components/Navbar";
+import { Loader } from "@mantine/core";
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
@@ -61,7 +62,7 @@ export default function SignUpPage() {
       <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
           <h1 className="text-2xl font-bold text-center text-gray-900">
-            Buat Akun Baru
+            Create New Account
           </h1>
           {error && (
             <p className="text-sm text-center text-red-600 bg-red-100 p-2 rounded">
@@ -73,7 +74,7 @@ export default function SignUpPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nama Lengkap"
+              placeholder="Full Name"
               required
               className="w-full px-4 py-2 text-gray-700 bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -104,9 +105,9 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 disabled:bg-gray-400"
+              className="w-full px-4 items-center justify-center py-2 font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 disabled:bg-gray-400"
             >
-              {loading ? "Mendaftar..." : "Daftar"}
+              {loading ? <Loader color="rgba(255, 255, 255, 1)" size="sm" type="dots" /> : "Sign Up"}
             </button>
           </form>
           <div className="relative my-4">
@@ -115,7 +116,7 @@ export default function SignUpPage() {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">
-                Atau daftar dengan
+                or continue with
               </span>
             </div>
           </div>
@@ -125,15 +126,15 @@ export default function SignUpPage() {
             className="w-full flex justify-center items-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
             <FcGoogle className="text-xl" />
-            Daftar dengan Google
+            Sign up with Google
           </button>
           <div className="text-center text-gray-500">
-            Sudah punya akun?{" "}
+            Already have an account?{" "}
             <Link
               href="/signin"
               className="font-medium text-blue-600 hover:underline"
             >
-              Masuk
+              Sign In
             </Link>
           </div>
         </div>

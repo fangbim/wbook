@@ -95,10 +95,10 @@ export default function Navbar({ cta, user }: NavbarProps) {
         </div>
       ) : (
         <Link
-          href={cta?.href || "#"}
+          href={cta?.href || "/signin"}
           className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-white font-semibold bg-[#212121] rounded-full focus:outline-none focus:ring-2"
         >
-          {cta?.label}
+          {cta?.label || "Sign In"}
         </Link>
       )}
     </nav>

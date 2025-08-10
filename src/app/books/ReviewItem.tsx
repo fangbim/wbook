@@ -1,6 +1,4 @@
-import { Avatar } from "@mantine/core";
-import { GoStar } from "react-icons/go";
-
+import { Avatar, Rating } from "@mantine/core";
 export type Review = {
   id: string;
   user: { name: string; avatarUrl: string };
@@ -10,26 +8,22 @@ export type Review = {
 
 // Komponen untuk satu item review
 export default function ReviewItem({ review }: { review: Review }) {
+  
   return (
     <div className="border-t border-gray-200 pt-6">
       <div className="flex items-start gap-4">
         {/* Avatar Pengguna */}
-        <Avatar color="cyan" radius="xl">{review.user.name.charAt(0)}</Avatar>
+        {review.user.avatarUrl ? (
+          <Avatar src={review.user.avatarUrl} alt={review.user.name} /> ): (
+             <Avatar color="cyan" radius="xl">{review.user.name.charAt(0)}</Avatar>
+          )
+        }
         <div className="flex-1">
           {/* Nama dan Rating */}
           <div className="flex items-center justify-between">
             <p className="font-semibold text-gray-800">{review.user.name}</p>
             <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <GoStar
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < review.rating
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
+              <Rating value={review.rating} readOnly />
             </div>
           </div>
           {/* Konten Review */}

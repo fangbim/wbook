@@ -1,47 +1,71 @@
 "use client";
 import { useSession } from "next-auth/react";
 import Navbar from "@/components/Navbar";
-import { GoEye, GoBook, GoStar, GoHeart } from "react-icons/go";
+import { GoEye, GoBook, GoStar, GoHeart, GoHeartFill } from "react-icons/go";
+import { GiOpenBook } from "react-icons/gi";
 import BookHeader from "@/components/BookDetails/BookHeader";
 import BookOverview from "@/components/BookDetails/BookOverview";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatISBN } from "@/utils/isbn";
 import { Book } from "@/schemas/book";
-import ReviewItem from "../ReviewItem";
+
+import ReviewForm from "../ReviewForm";
+import BookReviewList from "../BookReviewList";
+import { FaStar } from "react-icons/fa6";
 
 interface BookDetailClientProps {
   book: Book;
 }
 
-const reviews = [
-  {
-    id: "1",
-    user: { name: "Sarah W.", avatarUrl: "/avatars/sarah.jpg" },
-    rating: 5,
-    content:
-      "An absolutely fantastic read! Couldn't put it down. The characters are so well-developed and the plot is gripping.",
-  },
-  {
-    id: "2",
-    user: { name: "David L.", avatarUrl: "/avatars/david.jpg" },
-    rating: 4,
-    content:
-      "A very interesting perspective on the topic. Well-researched and thought-provoking, though it dragged a bit in the middle.",
-  },
-  {
-    id: "3",
-    user: { name: "Mia K.", avatarUrl: "/avatars/mia.jpg" },
-    rating: 5,
-    content: "This book changed my life! I highly recommend it to everyone.",
-  },
-];
-
-const rating = (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
-
 export default function BookDetailClient({ book }: BookDetailClientProps) {
   const { data: session } = useSession();
   const [isFavorited, setIsFavorited] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [hasReviewed, setHasReviewed] = useState(false);
+
+  useEffect(() => {
+    const checkUserReview = async () => {
+      if (!session?.user?.email || !book.id) return;
+
+      try {
+        const res = await fetch(`/api/review/has-reviewed?bookId=${book.id}`);
+        const data = await res.json();
+        setHasReviewed(data.hasReviewed);
+      } catch (error) {
+        console.error("Failed to check review status", error);
+      }
+    };
+
+    checkUserReview();
+  }, [session, book.id]);
+
+  const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState<number>(0);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await fetch(`/api/review?bookId=${book.id}`);
+      const data = await res.json();
+      setReviews(data);
+
+      if (data.length > 0) {
+        const total = data.reduce(
+          (acc: number, review: { rating: number }) => acc + review.rating,
+          0
+        );
+        const avg = total / data.length;
+        setAverageRating(Number(avg.toFixed(1)));
+      } else {
+        setAverageRating(0);
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, [book.id]);
 
   const formatDate = (date: string | Date) => {
     try {
@@ -52,6 +76,43 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
       });
     } catch {
       return "Unknown";
+    }
+  };
+
+  const handleSubmitReview = async ({
+    rating,
+    content,
+  }: {
+    rating: number;
+    content: string;
+  }) => {
+    try {
+      const res = await fetch("/api/review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookId: book.id,
+          rating,
+          content,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to submit review");
+      }
+
+      await fetchReviews();
+      setHasReviewed(true);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("An unknown error occurred.");
+      }
     }
   };
 
@@ -70,7 +131,7 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
         }}
       />
 
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         <div className="space-y-8">
           {/* Book Header */}
           <BookHeader
@@ -85,7 +146,7 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               {/* Tab Navigation */}
               <div className="border-b border-gray-200">
-                <nav className="flex" role="tablist">
+                <nav className="flex flex text-xs md:text-md" role="tablist">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
@@ -98,7 +159,7 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
                           : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                       }`}
                     >
-                      <tab.icon className="w-4 h-4" />
+                      <tab.icon />
                       <span className="hidden sm:inline">{tab.label}</span>
                     </button>
                   ))}
@@ -164,50 +225,32 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
 
                 {activeTab === "reviews" && (
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        Reviews ({reviews.length})
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <GoStar
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < Math.floor(parseFloat(rating))
-                                  ? "text-yellow-400 fill-current"
-                                  : "text-gray-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-gray-600">
-                          {rating} ({reviews.length} reviews)
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* ✅ INI BAGIAN UTAMANYA */}
-                    <div className="space-y-6">
-                      {reviews.length > 0 ? (
-                        reviews.map((review) => (
-                          // Kita akan buat komponen ReviewItem di langkah berikutnya
-                          <ReviewItem key={review.id} review={review} />
-                        ))
-                      ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <GoStar className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                          <p>
-                            No reviews yet. Be the first to review this book!
+                    {session?.user ? (
+                      hasReviewed ? (
+                        <div className="p-4 bg-green-50 border border-green-200 rounded-md text-green-800">
+                          <p className="text-sm">
+                            Thank you for your review! Your feedback helps
+                            others discover this book. 😊
                           </p>
                         </div>
-                      )}
+                      ) : (
+                        <ReviewForm onSubmit={handleSubmitReview} />
+                      )
+                    ) : (
+                      <div className="text-center justify-center">
+                      <p className="text-sm text-gray-600">
+                        You must be logged in to submit a review.
+                      </p>
+                      </div>
+                    )}
+                    <div className="space-y-6">
+                      <BookReviewList reviews={reviews} />
                     </div>
                   </div>
                 )}
               </div>
             </div>
-
+            
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Quick Stats */}
@@ -218,16 +261,16 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <GoStar className="w-4 h-4 text-yellow-400" />
+                      <FaStar className="w-4 h-4 text-yellow-400" />
                       <span className="text-sm text-gray-600">Rating</span>
                     </div>
                     <span className="font-medium text-gray-900">
-                      {rating}/5
+                      {averageRating}/5
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <GoBook className="w-4 h-4 text-blue-500" />
+                      <GiOpenBook className="w-4 h-4 text-blue-500" />
                       <span className="text-sm text-gray-600">Pages</span>
                     </div>
                     <span className="font-medium text-gray-900">
@@ -236,7 +279,7 @@ export default function BookDetailClient({ book }: BookDetailClientProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <GoHeart className="w-4 h-4 text-red-500" />
+                      <GoHeartFill className="w-4 h-4 text-red-500" />
                       <span className="text-sm text-gray-600">Reviews</span>
                     </div>
                     <span className="font-medium text-gray-900">

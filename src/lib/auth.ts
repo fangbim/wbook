@@ -38,7 +38,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email dan password harus diisi.');
+          throw new Error('Email and password must be filled.');
         }
 
         const user = await prisma.user.findUnique({
@@ -46,7 +46,7 @@ export const authOptions: AuthOptions = {
         });
 
         if (!user || !user.password || !(await bcrypt.compare(credentials.password, user.password))) {
-          throw new Error('Kredensial tidak valid.');
+          throw new Error('Invalid Credentials.');
         }
         
         return user;

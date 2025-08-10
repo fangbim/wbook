@@ -51,7 +51,8 @@ model User {
   password      String? 
   accounts      Account[]
   sessions      Session[]
-  collections  UserBook[]    // Relation field for books
+  collections  UserBook[]
+  reviews       Review[]
 }
 
 model VerificationToken {
@@ -79,6 +80,7 @@ model Book {
   updatedAt   DateTime @updatedAt
 
   users        UserBook[]
+  reviews      Review[]
 }
 
 model UserBook {
@@ -116,4 +118,19 @@ model Quote {
   createdAt    DateTime   @default(now())
 
   userBook     UserBook   @relation(fields: [userBookId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  rating    Int      
+  comment   String?  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId], name: "userId_bookId") 
 }

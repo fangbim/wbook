@@ -4,6 +4,7 @@ import {
   deleteQuote,
   fetchQuotesByBook,
 } from "@/lib/api/quotes";
+import { useQuotesStore } from "@/stores/useQuoteStore";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
 
@@ -31,6 +32,9 @@ export const useQuoteActions = ({
   setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
   setQuoteModalOpened?: (open: boolean) => void;
 }) => {
+
+  const { setQuotesForBook } = useQuotesStore();
+  
   const handleAddQuote = async (quote: NewQuote, page = 1) => {
     try {
       const result = await toast.promise(
@@ -105,7 +109,7 @@ export const useQuoteActions = ({
       if (result.success) {
         setQuotes(result.data);
         setQuotePagination?.(result.pagination);
-        console.log("Quotes loaded:", result.pagination);
+        setQuotesForBook(bookId, result.data);
       } else {
         toast.error(result.message || "❌ Failed to load quotes.");
       }

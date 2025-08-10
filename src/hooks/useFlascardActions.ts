@@ -1,5 +1,6 @@
 import { addFlashCard, deleteFlashcard, fetchFlashcardsByBook } from "@/lib/api/flascards";
 import { Flashcard } from "@/schemas/flashcard";
+import { useFlashcardStore } from "@/stores/useFlascardStore";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
 
@@ -17,6 +18,9 @@ export const useFlascardActions = ({
     setFlascardModalOpened?: (open: boolean) => void;
 
 }) => { 
+
+  const { setFlashcardsForBook } = useFlashcardStore();
+  
     const handleAddFlashcard =  async (flashcard: Flashcard, page = 1) => {
       try {
         const result = await toast.promise(
@@ -71,7 +75,7 @@ export const useFlascardActions = ({
         if (result.success) {
           setFlasCards(result.data);
           setFlashcardPagination?.(result.pagination);
-          console.log("Flashcards loaded:", result.pagination);
+          setFlashcardsForBook(bookId, result.data);
         } else {
           alert(result.message || "Failed to load flashcards.");
         }

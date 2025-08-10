@@ -33,11 +33,11 @@ export default function SignInPage() {
         router.push("/collection");
         router.refresh(); // Refresh to ensure middleware recognizes the new session
       } else {
-        setError(res?.error || "Email atau password salah.");
+        setError(res?.error || "Email or Password is incorrect.");
       }
     } catch (error) {
       console.error("Sign in error:", error);
-      setError("Gagal terhubung ke server.");
+      setError("Failed to connect to server.");
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ export default function SignInPage() {
       <div className="flex flex-col items-center justify-center flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
           <h1 className="text-2xl font-bold text-center text-gray-900">
-            Selamat Datang Kembali
+            Welcome Back
           </h1>
           {error && (
             <p className="text-sm text-center text-red-600 bg-red-100 p-2 rounded">
@@ -77,7 +77,7 @@ export default function SignInPage() {
               type="submit"
               className="w-full px-4 py-2 font-bold flex items-center justify-center text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 disabled:bg-gray-400"
             >
-              {loading ? <Loader color="rgba(255, 255, 255, 1)" size="sm" type="dots" /> : "Masuk"}
+              {loading ? <Loader color="rgba(255, 255, 255, 1)" size="sm" type="dots" /> : "Sign In"}
             </button>
           </form>
           <div className="relative my-4">
@@ -86,7 +86,7 @@ export default function SignInPage() {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">
-                Atau lanjut dengan
+                or continue with
               </span>
             </div>
           </div>
@@ -95,15 +95,15 @@ export default function SignInPage() {
             className="w-full flex justify-center items-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
             <FcGoogle className="text-xl" />
-            Masuk dengan Google
+            Sign in with Google
           </button>
           <div className="text-center text-gray-500">
-            Belum punya akun?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/signup"
               className="font-medium text-blue-600 hover:underline"
             >
-              Daftar sekarang
+              Sign Up
             </Link>
           </div>
         </div>

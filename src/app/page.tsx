@@ -240,8 +240,8 @@ export default function Home() {
                 <h1 className={`${karma.className} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight text-center`}>
                   Start Building Your Smarter <br/> Bookshelf Today
                 </h1>
-                <p className={`${karma.className} text-lg sm:text-xl lg:text-2xl font-light`}>
-                  Try WBook Free for 30 Days
+                <p className={`${karma.className} text-md sm:text-xl lg:text-2xl font-light`}>
+                  Smart, Simple, and Currently Free
                 </p>
               </div>
               <Link

@@ -59,7 +59,6 @@ export default function ReadingStatus({ userBook, book }: ReadingStatusProps) {
       });
 
       if (!res.ok) throw new Error("Failed to update status");
-      console.log("✅ Status updated");
     } catch (err) {
       console.error("❌ Failed to update status", err);
     }

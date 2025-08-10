@@ -13,7 +13,7 @@ type BookFormData = {
   description: string;
   publisher: string;
   publishDate: string;
-  pages: string;
+  pageCount: string;
   isbn: string;
   coverImage: File | null;
   coverImageUrl: string;
@@ -32,7 +32,7 @@ export default function AddBookPage() {
     description: "",
     publisher: "",
     publishDate: "",
-    pages: "",
+    pageCount: "",
     isbn: "",
     coverImage: null,
     coverImageUrl: "",
@@ -175,7 +175,7 @@ export default function AddBookPage() {
           description: formData.description,
           publisher: formData.publisher,
           publishDate: formData.publishDate,
-          pages: parseInt(formData.pages),
+          pageCount: parseInt(formData.pageCount),
           isbn: formData.isbn,
           coverImageUrl: coverUrl,
           category: formData.category,
@@ -197,7 +197,7 @@ export default function AddBookPage() {
         description: "",
         publisher: "",
         publishDate: "",
-        pages: "",
+        pageCount: "",
         isbn: "",
         coverImage: null,
         coverImageUrl: "",
@@ -497,20 +497,20 @@ export default function AddBookPage() {
                     </div>
                   </div>
 
-                  {/* Pages and ISBN */}
+                  {/* pageCount and ISBN */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="group">
                       <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Number of Pages
+                        Pages
                       </label>
                       <input
                         type="number"
-                        name="pages"
-                        value={formData.pages}
+                        name="pageCount"
+                        value={formData.pageCount}
                         onChange={handleInputChange}
                         min="1"
                         className="w-full p-4 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white/50 backdrop-blur-sm group-hover:border-slate-300"
-                        placeholder="Number of pages"
+                        placeholder="Number of pageCount"
                       />
                     </div>
 
